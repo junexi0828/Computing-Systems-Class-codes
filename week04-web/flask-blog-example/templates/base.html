@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask 블로그{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        .blog-header {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .content {
+            min-height: 70vh;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="blog-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <a href="{{ url_for('index') }}" class="text-decoration-none">
+                        <h1 class="display-6">Flask 블로그</h1>
+                    </a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <form action="{{ url_for('search') }}" method="get" class="d-flex">
+                        <input class="form-control me-2" type="search" name="query" placeholder="검색..." required>
+                        <button class="btn btn-outline-success" type="submit">검색</button>
+                    </form>
+                </div>
+                <div class="col-md-4 text-end">
+                    {% if is_logged_in %}
+                        <a href="{{ url_for('profile', username=session.username) }}" class="btn btn-outline-primary me-2">{{ session.username }}</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">로그아웃</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-primary me-2">로그인</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-primary">회원가입</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Flask 블로그 - 컴퓨터과학 개론 예제</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
