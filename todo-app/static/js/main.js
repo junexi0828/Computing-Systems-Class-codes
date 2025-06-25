@@ -1,187 +1,187 @@
-document.addEventListener('DOMContentLoaded', () => {
-    loadTodos();
-    setupEventListeners();
-});
+// API 엔드포인트
+const API_BASE_URL = '/api';
 
-function setupEventListeners() {
-    document.getElementById('todoForm').addEventListener('submit', handleSubmit);
-    document.getElementById('searchInput').addEventListener('input', handleSearch);
-}
+// DOM 요소
+const todoList = document.getElementById('todoList');
+const filterForm = document.getElementById('filterForm');
+const addTodoForm = document.getElementById('addTodoForm');
+const saveTodoBtn = document.getElementById('saveTodoBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const addTodoModal = new bootstrap.Modal(document.getElementById('addTodoModal'));
 
-async function loadTodos() {
-    try {
-        const response = await fetch('/todos');
-        const todos = await response.json();
-        displayTodos(todos);
-    } catch (error) {
-        console.error('Error loading todos:', error);
-    }
-}
-
-function displayTodos(todos) {
-    const todoList = document.getElementById('todoList');
-    todoList.innerHTML = '';
-    
-    todos.forEach(todo => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>
-                <input type="checkbox" class="form-check-input" 
-                    ${todo.is_completed ? 'checked' : ''} 
-                    onchange="toggleComplete(${todo.id})">
-            </td>
-            <td class="${todo.is_completed ? 'completed' : ''}">${todo.title}</td>
-            <td class="${todo.is_completed ? 'completed' : ''}">${todo.description || ''}</td>
-            <td class="priority-${getPriorityClass(todo.priority)}">${getPriorityText(todo.priority)}</td>
-            <td>${todo.due_date ? new Date(todo.due_date).toLocaleDateString() : ''}</td>
-            <td>${todo.category || ''}</td>
-            <td>
-                <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary" onclick="editTodo(${todo.id})">수정</button>
-                    <button class="btn btn-outline-danger" onclick="deleteTodo(${todo.id})">삭제</button>
-                </div>
-            </td>
-        `;
-        todoList.appendChild(row);
+// 유틸리티 함수
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 
+function isOverdue(dueDate) {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date();
+}
+
 function getPriorityClass(priority) {
-    switch (parseInt(priority)) {
-        case 1: return 'high';
-        case 2: return 'medium';
-        case 3: return 'low';
+    switch (priority) {
+        case '높음': return 'high';
+        case '중간': return 'medium';
+        case '낮음': return 'low';
         default: return 'medium';
     }
 }
 
-function getPriorityText(priority) {
-    switch (parseInt(priority)) {
-        case 1: return '높음';
-        case 2: return '중간';
-        case 3: return '낮음';
-        default: return '중간';
-    }
+// 할 일 아이템 렌더링
+function renderTodoItem(todo) {
+    const isOverdueTodo = isOverdue(todo.due_date);
+    const priorityClass = getPriorityClass(todo.priority);
+    
+    return `
+        <div class="list-group-item todo-item ${todo.completed ? 'completed' : ''} priority-${priorityClass}" data-id="${todo.id}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="checkbox" ${todo.completed ? 'checked' : ''} 
+                               onchange="toggleComplete(${todo.id})">
+                    </div>
+                    <div>
+                        <h6 class="todo-title mb-1">${todo.title}</h6>
+                        ${todo.description ? `<p class="mb-1 text-muted">${todo.description}</p>` : ''}
+                        <div class="d-flex gap-2">
+                            <span class="priority-badge ${priorityClass}">${todo.priority}</span>
+                            <span class="category-badge">${todo.category}</span>
+                            ${todo.due_date ? `
+                                <span class="due-date ${isOverdueTodo ? 'overdue' : ''}">
+                                    <i class="bi bi-calendar"></i> ${formatDate(todo.due_date)}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="todo-actions">
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteTodo(${todo.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
-async function handleSubmit(event) {
-    event.preventDefault();
-    
-    const todo = {
-        title: document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        priority: document.getElementById('priority').value,
-        due_date: document.getElementById('dueDate').value,
-        category: document.getElementById('category').value
-    };
-    
-    try {
-        const response = await fetch('/todos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(todo)
-        });
-        
-        if (response.ok) {
-            event.target.reset();
-            loadTodos();
-        }
-    } catch (error) {
-        console.error('Error creating todo:', error);
-    }
+// 통계 렌더링
+function renderStatistics(stats) {
+    // 진행률 업데이트
+    const progressBar = document.querySelector('.progress-bar');
+    progressBar.style.width = `${stats.completion_rate}%`;
+    progressBar.textContent = `${Math.round(stats.completion_rate)}%`;
+
+    // 우선순위별 통계
+    const priorityStats = document.getElementById('priorityStats');
+    priorityStats.innerHTML = Object.entries(stats.priority_stats)
+        .map(([priority, count]) => `
+            <div class="stat-item">
+                <span class="stat-label">${priority}</span>
+                <span class="badge bg-primary">${count}</span>
+            </div>
+        `).join('');
+
+    // 카테고리별 통계
+    const categoryStats = document.getElementById('categoryStats');
+    categoryStats.innerHTML = Object.entries(stats.category_stats)
+        .map(([category, count]) => `
+            <div class="stat-item">
+                <span class="stat-label">${category}</span>
+                <span class="badge bg-secondary">${count}</span>
+            </div>
+        `).join('');
+}
+
+// API 호출 함수
+async function fetchTodos(filters = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    const response = await fetch(`${API_BASE_URL}/todos?${queryParams}`);
+    if (!response.ok) throw new Error('할 일 목록을 불러오는데 실패했습니다');
+    return response.json();
+}
+
+async function fetchStatistics() {
+    const response = await fetch(`${API_BASE_URL}/todos/statistics`);
+    if (!response.ok) throw new Error('통계를 불러오는데 실패했습니다');
+    return response.json();
+}
+
+async function createTodo(data) {
+    const response = await fetch(`${API_BASE_URL}/todos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('할 일을 추가하는데 실패했습니다');
+    return response.json();
 }
 
 async function toggleComplete(id) {
-    try {
-        const response = await fetch(`/todos/${id}/complete`, {
-            method: 'PATCH'
-        });
-        
-        if (response.ok) {
-            loadTodos();
-        }
-    } catch (error) {
-        console.error('Error toggling todo:', error);
-    }
+    const response = await fetch(`${API_BASE_URL}/todos/${id}/complete`, {
+        method: 'PATCH'
+    });
+    if (!response.ok) throw new Error('상태 변경에 실패했습니다');
+    return response.json();
 }
 
 async function deleteTodo(id) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     
-    try {
-        const response = await fetch(`/todos/${id}`, {
-            method: 'DELETE'
-        });
-        
-        if (response.ok) {
-            loadTodos();
-        }
-    } catch (error) {
-        console.error('Error deleting todo:', error);
-    }
-}
-
-async function editTodo(id) {
-    try {
-        const response = await fetch(`/todos/${id}`);
-        const todo = await response.json();
-        
-        document.getElementById('title').value = todo.title;
-        document.getElementById('description').value = todo.description || '';
-        document.getElementById('priority').value = todo.priority;
-        document.getElementById('dueDate').value = todo.due_date ? todo.due_date.split('T')[0] : '';
-        document.getElementById('category').value = todo.category || '';
-        
-        // 폼 제출 핸들러를 수정 모드로 변경
-        const form = document.getElementById('todoForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            
-            const updatedTodo = {
-                title: document.getElementById('title').value,
-                description: document.getElementById('description').value,
-                priority: document.getElementById('priority').value,
-                due_date: document.getElementById('dueDate').value,
-                category: document.getElementById('category').value
-            };
-            
-            try {
-                const response = await fetch(`/todos/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedTodo)
-                });
-                
-                if (response.ok) {
-                    form.reset();
-                    form.onsubmit = handleSubmit; // 폼 핸들러를 원래대로 복원
-                    loadTodos();
-                }
-            } catch (error) {
-                console.error('Error updating todo:', error);
-            }
-        };
-    } catch (error) {
-        console.error('Error loading todo:', error);
-    }
-}
-
-function handleSearch(event) {
-    const searchTerm = event.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#todoList tr');
-    
-    rows.forEach(row => {
-        const title = row.cells[1].textContent.toLowerCase();
-        const description = row.cells[2].textContent.toLowerCase();
-        
-        if (title.includes(searchTerm) || description.includes(searchTerm)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
+    const response = await fetch(`${API_BASE_URL}/todos/${id}`, {
+        method: 'DELETE'
     });
-} 
+    if (!response.ok) throw new Error('삭제에 실패했습니다');
+    await refreshTodos();
+}
+
+// 이벤트 핸들러
+async function refreshTodos() {
+    try {
+        const formData = new FormData(filterForm);
+        const filters = Object.fromEntries(formData.entries());
+        
+        const [todos, stats] = await Promise.all([
+            fetchTodos(filters),
+            fetchStatistics()
+        ]);
+        
+        todoList.innerHTML = todos.map(renderTodoItem).join('');
+        renderStatistics(stats);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// 이벤트 리스너
+filterForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    refreshTodos();
+});
+
+saveTodoBtn.addEventListener('click', async () => {
+    try {
+        const formData = new FormData(addTodoForm);
+        const data = Object.fromEntries(formData.entries());
+        
+        await createTodo(data);
+        addTodoModal.hide();
+        addTodoForm.reset();
+        await refreshTodos();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+refreshBtn.addEventListener('click', refreshTodos);
+
+// 초기 로드
+document.addEventListener('DOMContentLoaded', refreshTodos); 

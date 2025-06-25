@@ -1,20 +1,21 @@
-version: '3.8'
-
 services:
   web:
     build: .
     ports:
-      - "15000:5000"
+      - "8000:5000"
     volumes:
       - .:/app
     environment:
       - DATABASE_URL=mysql://user:password@db:3306/todo_db
-      - SECRET_KEY=your-secret-key
+      - SECRET_KEY=todo-app-secret-key-2024
+      - JWT_SECRET_KEY=todo-app-jwt-secret-key-2024
+      - JWT_ACCESS_TOKEN_EXPIRES=3600
+      - JWT_REFRESH_TOKEN_EXPIRES=604800
+      - FLASK_ENV=production
     depends_on:
       db:
         condition: service_healthy
-    command: >
-      sh -c "flask db upgrade && gunicorn -b 0.0.0.0:5000 app:create_app()"
+    command: gunicorn -b 0.0.0.0:5000 app:app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s

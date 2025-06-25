@@ -2,67 +2,97 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12 mb-4">
-        <div class="card">
+    <!-- 필터 섹션 -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">필터</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">새 할 일 추가</h5>
-                <form id="todoForm">
+                <form id="filterForm">
                     <div class="mb-3">
-                        <input type="text" class="form-control" id="title" placeholder="제목" required>
+                        <label class="form-label">검색</label>
+                        <input type="text" class="form-control" name="search" placeholder="제목 또는 설명">
                     </div>
                     <div class="mb-3">
-                        <textarea class="form-control" id="description" placeholder="설명"></textarea>
+                        <label class="form-label">우선순위</label>
+                        <select class="form-select" name="priority">
+                            <option value="">전체</option>
+                            <option value="높음">높음</option>
+                            <option value="중간">중간</option>
+                            <option value="낮음">낮음</option>
+                        </select>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <select class="form-select" id="priority">
-                                <option value="1">높음</option>
-                                <option value="2" selected>중간</option>
-                                <option value="3">낮음</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <input type="date" class="form-control" id="dueDate">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <select class="form-select" id="category">
-                                <option value="개인">개인</option>
-                                <option value="업무">업무</option>
-                                <option value="학습">학습</option>
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">카테고리</label>
+                        <select class="form-select" name="category">
+                            <option value="">전체</option>
+                            <option value="개인">개인</option>
+                            <option value="업무">업무</option>
+                            <option value="학습">학습</option>
+                        </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">추가</button>
+                    <div class="mb-3">
+                        <label class="form-label">상태</label>
+                        <select class="form-select" name="completed">
+                            <option value="">전체</option>
+                            <option value="false">미완료</option>
+                            <option value="true">완료</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">정렬</label>
+                        <select class="form-select" name="sort_by">
+                            <option value="created_at">생성일</option>
+                            <option value="due_date">마감일</option>
+                            <option value="priority">우선순위</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">적용</button>
                 </form>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12">
+        <!-- 통계 섹션 -->
         <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">통계</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">할 일 목록</h5>
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="searchInput" placeholder="검색...">
+                <div id="statistics">
+                    <div class="mb-3">
+                        <h6>전체 진행률</h6>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>우선순위별</h6>
+                        <div id="priorityStats"></div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>카테고리별</h6>
+                        <div id="categoryStats"></div>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>완료</th>
-                                <th>제목</th>
-                                <th>설명</th>
-                                <th>우선순위</th>
-                                <th>마감일</th>
-                                <th>카테고리</th>
-                                <th>작업</th>
-                            </tr>
-                        </thead>
-                        <tbody id="todoList">
-                        </tbody>
-                    </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 할 일 목록 섹션 -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">할 일 목록</h5>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary" id="refreshBtn">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="todoList" class="list-group">
+                    <!-- 할 일 목록이 여기에 동적으로 추가됩니다 -->
                 </div>
             </div>
         </div>
