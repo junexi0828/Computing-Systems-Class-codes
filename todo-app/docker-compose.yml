@@ -3,8 +3,6 @@ services:
     build: .
     ports:
       - "8000:5000"
-    volumes:
-      - .:/app
     environment:
       - DATABASE_URL=mysql://user:password@db:3306/todo_db
       - SECRET_KEY=todo-app-secret-key-2024
@@ -39,6 +37,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: todo-app-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - web
 
 volumes:
   mysql_data:

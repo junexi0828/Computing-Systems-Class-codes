@@ -1,0 +1,66 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="API Flow" id="api-flow-1">
+    <mxGraphModel dx="1000" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- 사용자(브라우저) -->
+        <mxCell id="2" value="사용자(브라우저)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbe7;strokeColor=#ff9800;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="180" width="160" height="60" as="geometry" />
+        </mxCell>
+        <!-- 프론트엔드(React+Nginx) -->
+        <mxCell id="3" value="프론트엔드 (React+Nginx)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#2196f3;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- 백엔드(Flask API) -->
+        <mxCell id="4" value="백엔드 (Flask API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#43a047;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="80" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- DB -->
+        <mxCell id="5" value="DB (MySQL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#8e24aa;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <!-- 로그인 요청 -->
+        <mxCell id="6" value="로그인 요청 (POST /api/auth/login)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 로그인 프록시 -->
+        <mxCell id="7" value="/api 프록시" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- JWT 발급 -->
+        <mxCell id="8" value="JWT 발급 (access/refresh)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#43a047;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="4" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- JWT 저장 -->
+        <mxCell id="9" value="JWT 저장 (localStorage)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="3" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 인증된 Todo 요청 -->
+        <mxCell id="10" value="Todo 요청 (GET/POST /api/todos) + JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 프록시 -->
+        <mxCell id="11" value="/api 프록시" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- JWT 인증/검증 -->
+        <mxCell id="12" value="JWT 인증/검증 (미인증시 401)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#43a047;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="4" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- DB 쿼리 -->
+        <mxCell id="13" value="DB 쿼리" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#8e24aa;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="4" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Todo 응답 -->
+        <mxCell id="14" value="Todo 응답 (JSON)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="4" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 프론트 → 사용자 응답 -->
+        <mxCell id="15" value="화면 갱신/알림" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#ff9800;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="3" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

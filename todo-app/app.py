@@ -22,8 +22,12 @@ def create_app(db_uri=None):
     # 확장 초기화
     init_extensions(app)
 
-    # CORS 설정
-    CORS(app)
+    # CORS 설정 - 프론트엔드 개발 서버 허용
+    CORS(app,
+         origins=['http://localhost:3000', 'http://127.0.0.1:3000'],
+         supports_credentials=True,
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+         allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'])
 
     # 블루프린트 등록
     app.register_blueprint(auth_bp, url_prefix='/api/auth')

@@ -1,0 +1,53 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="ERD" id="erd-1">
+    <mxGraphModel dx="1000" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- User 테이블 -->
+        <mxCell id="2" value="User" style="swimlane;html=1;fillColor=#e3f2fd;strokeColor=#2196f3;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="200" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="id (PK)\nusername (UQ)\nemail (UQ)\npassword_hash\ncreated_at\nrole\nis_admin" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="2">
+          <mxGeometry x="0" y="30" width="200" height="150" as="geometry" />
+        </mxCell>
+        <!-- Todo 테이블 -->
+        <mxCell id="4" value="Todo" style="swimlane;html=1;fillColor=#e8f5e9;strokeColor=#43a047;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="40" width="200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="id (PK)\nuser_id (FK)\ntitle\ndescription\npriority\ndue_date\ncategory\nis_completed\ncreated_at\nupdated_at" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="4">
+          <mxGeometry x="0" y="30" width="200" height="180" as="geometry" />
+        </mxCell>
+        <!-- Tag 테이블 -->
+        <mxCell id="6" value="Tag" style="swimlane;html=1;fillColor=#f3e5f5;strokeColor=#8e24aa;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="320" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="id (PK)\nuser_id (FK)\nname\ncolor\ncreated_at" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="6">
+          <mxGeometry x="0" y="30" width="200" height="100" as="geometry" />
+        </mxCell>
+        <!-- TodoTag 테이블 -->
+        <mxCell id="8" value="TodoTag" style="swimlane;html=1;fillColor=#fffbe7;strokeColor=#ff9800;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="180" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="id (PK)\ntodo_id (FK)\ntag_id (FK)\ncreated_at" style="text;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="8">
+          <mxGeometry x="0" y="30" width="160" height="80" as="geometry" />
+        </mxCell>
+        <!-- 관계선: User 1:N Todo -->
+        <mxCell id="10" value="1:N" style="endArrow=block;endFill=1;strokeColor=#2196f3;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="2" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 관계선: User 1:N Tag -->
+        <mxCell id="11" value="1:N" style="endArrow=block;endFill=1;strokeColor=#8e24aa;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="2" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 관계선: Todo N:M Tag (via TodoTag) -->
+        <mxCell id="12" value="N:M" style="endArrow=block;endFill=1;strokeColor=#ff9800;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="4" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="N:M" style="endArrow=block;endFill=1;strokeColor=#ff9800;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="6" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
